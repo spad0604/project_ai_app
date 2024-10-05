@@ -20,24 +20,37 @@ mixin _$SongInfomationState {
   double? get scrollPosition => throw _privateConstructorUsedError;
   bool get isPlayingMusic => throw _privateConstructorUsedError;
   List<SongByArtist> get listSongByArtist => throw _privateConstructorUsedError;
+  String? get previewUrl => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)
+    required TResult Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)?
+    TResult? Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)?
         initial,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)?
+    TResult Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)?
         initial,
     required TResult orElse(),
   }) =>
@@ -76,7 +89,8 @@ abstract class $SongInfomationStateCopyWith<$Res> {
       {bool isMinimized,
       double? scrollPosition,
       bool isPlayingMusic,
-      List<SongByArtist> listSongByArtist});
+      List<SongByArtist> listSongByArtist,
+      String? previewUrl});
 }
 
 /// @nodoc
@@ -98,6 +112,7 @@ class _$SongInfomationStateCopyWithImpl<$Res, $Val extends SongInfomationState>
     Object? scrollPosition = freezed,
     Object? isPlayingMusic = null,
     Object? listSongByArtist = null,
+    Object? previewUrl = freezed,
   }) {
     return _then(_value.copyWith(
       isMinimized: null == isMinimized
@@ -116,6 +131,10 @@ class _$SongInfomationStateCopyWithImpl<$Res, $Val extends SongInfomationState>
           ? _value.listSongByArtist
           : listSongByArtist // ignore: cast_nullable_to_non_nullable
               as List<SongByArtist>,
+      previewUrl: freezed == previewUrl
+          ? _value.previewUrl
+          : previewUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -132,7 +151,8 @@ abstract class _$$InitialImplCopyWith<$Res>
       {bool isMinimized,
       double? scrollPosition,
       bool isPlayingMusic,
-      List<SongByArtist> listSongByArtist});
+      List<SongByArtist> listSongByArtist,
+      String? previewUrl});
 }
 
 /// @nodoc
@@ -152,6 +172,7 @@ class __$$InitialImplCopyWithImpl<$Res>
     Object? scrollPosition = freezed,
     Object? isPlayingMusic = null,
     Object? listSongByArtist = null,
+    Object? previewUrl = freezed,
   }) {
     return _then(_$InitialImpl(
       isMinimized: null == isMinimized
@@ -170,6 +191,10 @@ class __$$InitialImplCopyWithImpl<$Res>
           ? _value._listSongByArtist
           : listSongByArtist // ignore: cast_nullable_to_non_nullable
               as List<SongByArtist>,
+      previewUrl: freezed == previewUrl
+          ? _value.previewUrl
+          : previewUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -181,7 +206,8 @@ class _$InitialImpl implements _Initial {
       {this.isMinimized = false,
       this.scrollPosition = 0.0,
       this.isPlayingMusic = true,
-      final List<SongByArtist> listSongByArtist = const []})
+      final List<SongByArtist> listSongByArtist = const [],
+      this.previewUrl})
       : _listSongByArtist = listSongByArtist;
 
   @override
@@ -204,8 +230,11 @@ class _$InitialImpl implements _Initial {
   }
 
   @override
+  final String? previewUrl;
+
+  @override
   String toString() {
-    return 'SongInfomationState.initial(isMinimized: $isMinimized, scrollPosition: $scrollPosition, isPlayingMusic: $isPlayingMusic, listSongByArtist: $listSongByArtist)';
+    return 'SongInfomationState.initial(isMinimized: $isMinimized, scrollPosition: $scrollPosition, isPlayingMusic: $isPlayingMusic, listSongByArtist: $listSongByArtist, previewUrl: $previewUrl)';
   }
 
   @override
@@ -220,12 +249,19 @@ class _$InitialImpl implements _Initial {
             (identical(other.isPlayingMusic, isPlayingMusic) ||
                 other.isPlayingMusic == isPlayingMusic) &&
             const DeepCollectionEquality()
-                .equals(other._listSongByArtist, _listSongByArtist));
+                .equals(other._listSongByArtist, _listSongByArtist) &&
+            (identical(other.previewUrl, previewUrl) ||
+                other.previewUrl == previewUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isMinimized, scrollPosition,
-      isPlayingMusic, const DeepCollectionEquality().hash(_listSongByArtist));
+  int get hashCode => Object.hash(
+      runtimeType,
+      isMinimized,
+      scrollPosition,
+      isPlayingMusic,
+      const DeepCollectionEquality().hash(_listSongByArtist),
+      previewUrl);
 
   /// Create a copy of SongInfomationState
   /// with the given fields replaced by the non-null parameter values.
@@ -238,36 +274,48 @@ class _$InitialImpl implements _Initial {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)
+    required TResult Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)
         initial,
   }) {
-    return initial(
-        isMinimized, scrollPosition, isPlayingMusic, listSongByArtist);
+    return initial(isMinimized, scrollPosition, isPlayingMusic,
+        listSongByArtist, previewUrl);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)?
+    TResult? Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)?
         initial,
   }) {
-    return initial?.call(
-        isMinimized, scrollPosition, isPlayingMusic, listSongByArtist);
+    return initial?.call(isMinimized, scrollPosition, isPlayingMusic,
+        listSongByArtist, previewUrl);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(bool isMinimized, double? scrollPosition,
-            bool isPlayingMusic, List<SongByArtist> listSongByArtist)?
+    TResult Function(
+            bool isMinimized,
+            double? scrollPosition,
+            bool isPlayingMusic,
+            List<SongByArtist> listSongByArtist,
+            String? previewUrl)?
         initial,
     required TResult orElse(),
   }) {
     if (initial != null) {
-      return initial(
-          isMinimized, scrollPosition, isPlayingMusic, listSongByArtist);
+      return initial(isMinimized, scrollPosition, isPlayingMusic,
+          listSongByArtist, previewUrl);
     }
     return orElse();
   }
@@ -306,7 +354,8 @@ abstract class _Initial implements SongInfomationState {
       {final bool isMinimized,
       final double? scrollPosition,
       final bool isPlayingMusic,
-      final List<SongByArtist> listSongByArtist}) = _$InitialImpl;
+      final List<SongByArtist> listSongByArtist,
+      final String? previewUrl}) = _$InitialImpl;
 
   @override
   bool get isMinimized;
@@ -316,6 +365,8 @@ abstract class _Initial implements SongInfomationState {
   bool get isPlayingMusic;
   @override
   List<SongByArtist> get listSongByArtist;
+  @override
+  String? get previewUrl;
 
   /// Create a copy of SongInfomationState
   /// with the given fields replaced by the non-null parameter values.

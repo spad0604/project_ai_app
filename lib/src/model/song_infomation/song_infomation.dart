@@ -28,7 +28,7 @@ class DeezerSongModel {
   @JsonKey(name: "rank")
   final int rank;
   @JsonKey(name: "release_date")
-  final DateTime releaseDate;
+  final String releaseDate;
   @JsonKey(name: "explicit_lyrics")
   final bool explicitLyrics;
   @JsonKey(name: "explicit_content_lyrics")
@@ -98,7 +98,7 @@ class DeezerSongModel {
     int? trackPosition,
     int? diskNumber,
     int? rank,
-    DateTime? releaseDate,
+    String? releaseDate,
     bool? explicitLyrics,
     int? explicitContentLyrics,
     int? explicitContentCover,
@@ -168,7 +168,7 @@ class Album {
   @JsonKey(name: "md5_image")
   final String md5Image;
   @JsonKey(name: "release_date")
-  final DateTime releaseDate;
+  final String releaseDate;
   @JsonKey(name: "tracklist")
   final String tracklist;
   @JsonKey(name: "type")
@@ -199,7 +199,7 @@ class Album {
     String? coverBig,
     String? coverXl,
     String? md5Image,
-    DateTime? releaseDate,
+    String? releaseDate,
     String? tracklist,
     String? type,
   }) =>

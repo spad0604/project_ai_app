@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -5,6 +6,7 @@ import 'package:shazam_app/src/model/song_by_artist/song_by_artist.dart';
 import 'package:shazam_app/src/network/song_by_artist_service/song_by_artist_service.dart';
 
 part 'song_infomation_state.dart';
+
 part 'song_infomation_cubit.freezed.dart';
 
 @singleton
@@ -19,14 +21,25 @@ class SongInfomationCubit extends Cubit<SongInfomationState> {
     emit(state.copyWith(scrollPosition: value));
   }
 
-  void playMusic() {
+  void playMusic(AudioPlayer audioPlayer, String urlAudio) async {
+    if (state.isPlayingMusic) {
+      await audioPlayer.pause();
+    } else {
+      if (audioPlayer.state == PlayerState.paused) {
+        await audioPlayer.resume();
+      } else {
+        final url = urlAudio;
+        await audioPlayer.play(UrlSource(url));
+      }
+    }
     emit(state.copyWith(isPlayingMusic: !state.isPlayingMusic));
   }
 
   Future<void> getMusicByArtist(String artist) async {
     final songByArtistService = SongByArtistService();
     try {
-      List<SongByArtist>? list = await songByArtistService.getSongByArtist(artist);
+      List<SongByArtist>? list =
+          await songByArtistService.getSongByArtist(artist);
       if (list != null) {
         emit(state.copyWith(listSongByArtist: list));
       } else {
@@ -37,4 +50,9 @@ class SongInfomationCubit extends Cubit<SongInfomationState> {
     }
   }
 
+  void setPreviewUrl(String? url) {
+    if(url != null) {
+      emit(state.copyWith(previewUrl: url));
+    }
+  }
 }

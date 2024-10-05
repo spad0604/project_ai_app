@@ -16,8 +16,8 @@ class SongByArtistService {
   Future<List<SongByArtist>?> getSongByArtist(String? id) async {
     try {
       final response = await _dio!.get('$id/top?limit=50');
-      print('ket qua ${response.data['data'].toString()}');
       if (response.data != null && response.data['data'] is List) {
+        print(response.data['data']);
         final List<SongByArtist> result = (response.data['data'] as List)
             .map((item) => SongByArtist.fromJson(item))
             .toList();

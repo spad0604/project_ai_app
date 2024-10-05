@@ -20,40 +20,46 @@ class SongScreen extends StatefulWidget {
 class _SongScreenState extends State<SongScreen> {
   final shazam = getIt<SongScreenCubit>();
   final bloc = getIt<SongInfomationCubit>();
+
   List<SongByArtist> songByArtistList = [];
-
   late AudioPlayer _audioPlayer;
-
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    shazam.resetData();
-    _audioPlayer = AudioPlayer();
-    _initilaze();
-
+    _initialize();
     songByArtistList = bloc.state.listSongByArtist;
-    _playerPreview();
+
+    bloc.setPreviewUrl(widget.song?.preview);
+
+    _scrollController.addListener(() {
+      bloc.setScrollControler(_scrollController.position.pixels);
+      print(_scrollController.position.pixels);
+    });
+
     super.initState();
   }
 
   void dispose() {
     _audioPlayer.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _initilaze() async {
+  Future<void> _initialize() async {
+    _audioPlayer = AudioPlayer();
+    shazam.resetData();
+    shazam.stopRecognizing();
     bloc.getMusicByArtist(widget.song!.artist.id.toString());
+
+    if (bloc.state.isPlayingMusic == true) {
+      _playerPreview(widget.song!.preview);
+    }
   }
 
-  Future<void> _playerPreview() async {
-    print(widget.song?.preview.toString());
-    final url = widget.song?.preview.toString();
+  Future<void> _playerPreview(String? url) async {
     if (url != null) {
       await _audioPlayer.play(UrlSource(url));
-    }
-    else {
-      bloc.playMusic();
     }
   }
 
@@ -63,136 +69,172 @@ class _SongScreenState extends State<SongScreen> {
     return BlocBuilder<SongInfomationCubit, SongInfomationState>(
       bloc: bloc,
       builder: (context, state) {
+        if (state.isPlayingMusic == false && _audioPlayer.state == PlayerState.playing) {
+          _audioPlayer.pause();
+        } else if (state.isPlayingMusic == true) {
+          _playerPreview(state.previewUrl);
+        }
+
         songByArtistList = state.listSongByArtist;
-        bool isMinimized = state.isMinimized;
+
+        double? scrollValue = state.scrollPosition ?? screenWidth;
+
+        double imageSize = screenWidth;
+
+        if (scrollValue > 100) {
+          imageSize = screenWidth - screenWidth / 2;
+        } else if (scrollValue >= 20) {
+          imageSize = screenWidth - (screenWidth * scrollValue / 100);
+        }
+
         return Scaffold(
           backgroundColor: Colors.black,
-          body: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SafeArea(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10, left: 10),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.arrow_back,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        GestureDetector(
-                          onTap: bloc.toggleMinimize,
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.zoom_out_map,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  width: isMinimized ? 100 : screenWidth,
-                  height: isMinimized ? 100 : screenWidth,
-                  margin: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.song?.album.coverBig ?? ''),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: TextMarquee(
-                        widget.song?.title ?? '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        bloc.playMusic();
-                        if(state.isPlayingMusic == false) {
-                          dispose();
-                        } else {
-                          _playerPreview();
-                        }
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(state.isPlayingMusic
-                            ? Icons.pause
-                            : Icons.play_arrow),
-                      ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    widget.song?.artist.name ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 15,
-                      color: Color(0xFF818185),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    'SONG FROM ${widget.song?.artist.name}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                _songByArtistList(),
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  color: const Color(0xFF141414),
-                  child: Column(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SafeArea(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10, left: 10),
+                  child: Row(
                     children: [
-                      _buildRow('Track', widget.song?.title ?? ''),
-                      _divider(),
-                      _buildRow('Artist', widget.song?.artist.name ?? ''),
-                      _divider(),
-                      _buildRow('Album', widget.song?.album.title ?? ''),
-                      _divider(),
-                      _buildRow(
-                          'Release', widget.song?.releaseDate.toString() ?? '')
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                )
-              ],
-            ),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _playerPreview(widget.song?.preview);
+                          bloc.setPreviewUrl(widget.song?.preview);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(seconds: 1),
+                          width: imageSize,
+                          height: imageSize,
+                          margin: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(widget.song?.album.coverBig ?? ''),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: GestureDetector(
+                              onTap: () {
+                                _playerPreview(widget.song?.preview);
+                                bloc.setPreviewUrl(widget.song?.preview);
+                              },
+                              child: TextMarquee(
+                                widget.song?.title ?? '',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 30,
+                                  color: Colors.white,
+                                ),
+                                spaceSize: 72,
+                                delay: const Duration(seconds: 2),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              bloc.playMusic(
+                                  _audioPlayer, widget.song!.preview.toString());
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              child: Icon(state.isPlayingMusic
+                                  ? Icons.pause
+                                  : Icons.play_arrow),
+                            ),
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          widget.song?.artist.name ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 15,
+                            color: Color(0xFF818185),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'SONG FROM ${widget.song?.artist.name}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      _songByArtistList(),
+                      const SizedBox(height: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'TRACK INFOMATION',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        color: const Color(0xFF141414),
+                        child: Column(
+                          children: [
+                            _buildRow('Track', widget.song?.title ?? ''),
+                            _divider(),
+                            _buildRow('Artist', widget.song?.artist.name ?? ''),
+                            _divider(),
+                            _buildRow('Album', widget.song?.album.title ?? ''),
+                            _divider(),
+                            _buildRow('Release', widget.song?.releaseDate ?? '')
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: screenWidth / 2,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -203,31 +245,37 @@ class _SongScreenState extends State<SongScreen> {
     return BlocBuilder<SongInfomationCubit, SongInfomationState>(
       bloc: bloc,
       builder: (context, state) {
-        return Container(
-          height: 200, 
+        return SizedBox(
+          height: 200,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: songByArtistList.map((song) {
-                return Container(
-                  color: Colors.black,
-                  width: 100,
-                  height: 150,
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Card(
+                return GestureDetector(
+                  onTap: () {
+                    bloc.setPreviewUrl(song.preview);
+                    _playerPreview(song.preview);
+                  },
+                  child: Container(
                     color: Colors.black,
-                    child: Column(
-                      children: [
-                        Image.network(song.album.cover ?? ''),
-                        Text(
-                          song.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 10,
+                    width: 200,
+                    height: 250,
+                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Card(
+                      color: Colors.black,
+                      child: Column(
+                        children: [
+                          Image.network(song.album.cover ?? ''),
+                          Text(
+                            song.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

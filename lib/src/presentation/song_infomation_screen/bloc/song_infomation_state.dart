@@ -6,5 +6,6 @@ class SongInfomationState with _$SongInfomationState {
       {@Default(false) bool isMinimized,
       @Default(0.0) double? scrollPosition,
       @Default(true) bool isPlayingMusic,
-      @Default([]) List<SongByArtist> listSongByArtist}) = _Initial;
+      @Default([]) List<SongByArtist> listSongByArtist,
+      String? previewUrl}) = _Initial;
 }

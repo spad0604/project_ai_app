@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:acr_cloud_sdk/acr_cloud_sdk.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shazam_app/src/model/song_infomation/song_infomation.dart';
@@ -76,4 +79,5 @@ class SongScreenCubit extends Cubit<SongScreenState> {
     emit(state.copyWith(success: false));
     emit(state.copyWith(isRecognizing: false));
   }
+
 }
